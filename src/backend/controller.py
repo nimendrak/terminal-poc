@@ -1,78 +1,52 @@
-import os
-from flask import Flask, request, Response, Api
-from flask_socketio import SocketIO, send
-
-from util import make_response
+from flask import Flask, request, Response, jsonify
+from flask_socketio import SocketIO, emit
 import subprocess
 
 
 app = Flask(__name__)
-app.config['SECRET KEY'] = "mykey"
+app.config["SECRET KEY"] = "mykey"
 app.config["DEBUG"] = True
-api = Api(app)
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 def shell_run():
-    cmd = "ping www.google.lk"
+    try:
+        # cmd = "seq 1 20"
+        cmd = "ping www.google.lk"
 
-    process = subprocess.Popen(cmd,
-                               shell=True,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               universal_newlines=True)
+        process = subprocess.Popen(
+            cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
 
-    while True:
-        next_line = process.stdout.readline()
-        if next_line:
-            socketio.emit('shell output', next_line)
-        elif not process.poll():
-            break
+        while True:
+            next_line = process.stdout.readline()
+            if next_line:
+                print(next_line)
+                indices = [49, 63]
+                parts = [next_line[i:j] for i, j in zip(indices, indices[1:] + [None])]
+                # print(parts[0])
+                # socketio.emit("output", "123")
+                socketio.emit("output", next_line)
+                socketio.sleep(2)
+            elif not process.poll():
+                break
 
-    emit("newdata", {"td": sample}, namespace="/home")
-    socketio.sleep(1)
+    except Exception as e:
+        print(e)
 
-@socketio.on("connect", namespace="/shell")
+
+@socketio.on("connect")
 def frontend_connection():
-  print("Client is Connected")
-  shell_run()
+    print("\n*******************")
+    print("Client is Connected")
+    print("*******************\n")
+    emit("status", "Connection Established")
+    shell_run()
 
 
-# @app.route("/api/shell/<cmd>", methods=["GET"])
-# def run_command(cmd, print_constantly=False, cwd=None):
-#     try:
-#         output = []
-#         process = subprocess.Popen(cmd,
-#                                    shell=True,
-#                                    stdout=subprocess.PIPE,
-#                                    stderr=subprocess.PIPE,
-#                                    universal_newlines=True)
-
-#         while True:
-#             next_line = process.stdout.readline()
-#             if next_line:
-#                 output.append(str(next_line))
-#                 if print_constantly:
-#                     print(next_line)
-#             elif not process.poll():
-#                 break
-
-#         error = process.communicate()[1]
-
-#         if len(output) > 0:
-#             result = {}
-#             result["output"] = process.returncode, '\n'.join(output), error
-
-#             response = make_response(result, True, 200)
-#             return Response(response=response, status=200, mimetype='application/json')
-#         else:
-#             response = make_response("404 Error", True, 404)
-#             return Response(response=response, status=200, mimetype='application/json')
-
-#     except Exception as e:
-#         response = make_response("Exception - {}".format(e), False, 500)
-#         return Response(response=response, status=500, mimetype='application/json')
-
-
-if __name__ == '__main__':
-    socketio.run(app)
+if __name__ == "__main__":
+    socketio.run(app, host='0.0.0.0', port=5000)

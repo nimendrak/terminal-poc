@@ -1,7 +1,7 @@
 import React, { Component, useState, useEffect } from "react";
 import Terminal from "react-terminal-view";
 import { io } from "socket.io-client";
-import axios from 'axios'
+import axios from "axios";
 
 export default class App extends Component {
   constructor(props) {
@@ -11,13 +11,17 @@ export default class App extends Component {
     };
   }
 
+  componentDidMount() {
+    console.log("componentDidMount");
 
-  useEffect(() => {
-    const socket = io.connect('http://127.0.0.1:5000/shell')
-    socket.on('connect', (data) => console.log(data))
+    socket = io('http://127.0.0.1:5000/');
 
-    socket.on('newdata', (data) => console.log(data))
-  }, []);
+    socket.on("status", (data) => {
+      console.log("socket connected - " + socket.connected);
+      console.log("socket id - " + socket.id);
+      console.log(data);
+    });
+  }
 
   render() {
     return (
