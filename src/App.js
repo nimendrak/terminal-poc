@@ -12,15 +12,11 @@ export default class App extends Component {
 
   async componentDidMount() {
     const url =
-      "https://api.fungenerators.com/name/categories.json?start=0&limit=5";
+      "https://api.fungenerators.com/name/categories.json?start=0&limit=3";
     const response = await fetch(url);
     const data = await response.json();
 
-    // this.setState({
-    //   lines: [data.contents[0][0].name],
-    // });
-
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 3; i++) {
       this.state.tempArr.push(data.contents[0][i].name);
     }
 
