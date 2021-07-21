@@ -1,36 +1,34 @@
 import React from "react";
-// import io from "socket.io-client";
+import io from "socket.io-client";
 import Terminal from "react-terminal-view";
 // import Terminal, { ColorMode, LineType } from 'react-terminal-ui';
 
-class Dashboard extends React.Component {
+class FlaskApp extends React.Component {
   state = {
     logs: ["Backend Logs"],
     socketData: "",
   };
 
   componentWillUnmount() {
-    const { ws } = this.state;
-    ws.close();
+    this.socket.close();
     console.log("component unmounted");
   }
 
   componentDidMount() {
-    console.log("component mounted");
-
-    const ws = new WebSocket("ws://localhost:8000/ws");
-    ws.onmessage = this.onMessage;
-  }
-
-  onMessage = (ev) => {
-    const recv = JSON.parse(ev.data);
-    console.log(recv.value);
-
-    this.setState({
-      logs: this.state.logs.concat(recv.value),
+    var sensorEndpoint = "http://localhost:5000";
+    this.socket = io.connect(sensorEndpoint, {
+      reconnection: true,
+      // transports: ['websocket']
     });
-  };
-
+    console.log("component mounted");
+    this.socket.on("responseMessage", (message) => {
+      this.setState({ socketData: message.log });
+      console.log("responseMessage", message);
+      this.setState({
+        logs: this.state.logs.concat(this.state.socketData),
+      });
+    });
+  }
   render() {
     return (
       <div
@@ -45,4 +43,4 @@ class Dashboard extends React.Component {
     );
   }
 }
-export default Dashboard;
+export default FlaskApp;
