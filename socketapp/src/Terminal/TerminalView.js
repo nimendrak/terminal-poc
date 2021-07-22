@@ -1,54 +1,44 @@
-import React, {useState} from "react";
-// import Terminal from "react-terminal-view";
+import React, { useEffect, useState } from "react";
 import Terminal, { ColorMode, LineType } from "react-terminal-ui";
+import './TerminalView.css';
 
-class TerminalView extends React.Component {
-  state = {
-    logs: ["Backend Logs"],
-    socketData: "",
-  };
+const ws = new WebSocket("ws://localhost:8000/shell");
 
-  componentWillUnmount() {
-    const { ws, interval } = this.state;
-    ws.close();
-    clearInterval(interval);
-  }
+const TerminalController = ({ props }) => {
+  const [terminalLineData, setTerminalLineData] = useState([]);
 
-  componentDidMount() {
-    const ws = new WebSocket("ws://localhost:8000/shell");
-    ws.onmessage = this.onMessage;
+  useEffect(() => {
+    ws.onopen = () => {
+      // on connecting, do nothing but log it to the console
+      console.log("connected");
+    };
 
-    this.setState({
-      ws: ws,
-      // Create an interval to send echo messages to the server
-      interval: setInterval(() => ws.send("echo"), 1000),
-    });
+    ws.onmessage = (evt) => {
+      // listen to data sent from the websocket server
+      const response = JSON.parse(evt.data);
+      setTerminalLineData((currentData) => [...currentData, response]);
+      console.log(response);
+    };
 
-    console.log("component mounted");
-  }
+    ws.onclose = () => {
+      console.log("disconnected");
+      // automatically try to reconnect on connection loss
+    };
+  }, []);
 
-  onMessage = (ev) => {
-    const recv = JSON.parse(ev.data);
-    console.log(recv.value);
-    this.socketData = recv.value;
-    this.setState({
-      logs: this.state.logs.concat(this.socketData),
-    });
-  };
+  // Terminal has 100% width by default so it should usually be wrapped in a container div
+  return (
+    <div className="container">
+      <Terminal
+        name="Backend Logs"
+        colorMode={ColorMode.Dark}
+        lineData={terminalLineData}
+        onInput={(terminalInput) =>
+          console.log(`New terminal input received: '${terminalInput}'`)
+        }
+      />
+    </div>
+  );
+};
 
-  render() {
-    return (
-      <div className="container">
-        {/* <Terminal
-          name="CloudTerra Backend Logs"
-          colorMode={ColorMode.Dark}
-          lineData={this.logs}
-          onInput={(terminalInput) =>
-            console.log(`New terminal input received: '${terminalInput}'`)
-          }
-        /> */}
-      </div>
-    );
-  }
-}
-export default TerminalView;
+export default TerminalController;
