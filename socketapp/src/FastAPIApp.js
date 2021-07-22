@@ -10,25 +10,27 @@ class Dashboard extends React.Component {
   };
 
   componentWillUnmount() {
-    this.socket.close();
-    console.log("component unmounted");
+    const {ws, interval} = this.state;
+    ws.close()
+    clearInterval(interval)
   }
 
   componentDidMount() {
-    var sensorEndpoint = "http://localhost:5000";
-    this.socket = io.connect(sensorEndpoint, {
-      reconnection: true,
-      // transports: ['websocket']
-    });
+   const ws = new WebSocket('ws://localhost:8000/shell')
+    ws.onmessage = this.onMessage
+
     console.log("component mounted");
-    this.socket.on("responseMessage", (message) => {
-      this.setState({ socketData: message.log });
-      console.log("responseMessage", message);
-      this.setState({
-        logs: this.state.logs.concat(this.state.socketData),
-      });
+  }
+
+  onMessage = (ev) => {
+    const recv = JSON.parse(ev.data)
+    console.log(recv.value)
+    this.socketData = recv.value
+    this.setState({
+      logs: this.state.logs.concat(this.socketData),
     });
   }
+
   render() {
     return (
       <div

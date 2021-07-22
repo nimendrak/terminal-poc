@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 // import App from './App';
-import FlaskApp from './FlaskApp.js';
+// import FlaskApp from './FlaskApp.js';
 import FastAPIApp from './FastAPIApp.js';
 import * as serviceWorker from './serviceWorker';
 
