@@ -1,17 +1,20 @@
-# react-flask-socketio
-This is a base code for testing websocket connection between python flask with socketio as Server and react Webapp as client
+# Terminal POC
 
-Run server.py (localhost:5000) <br />
-Go to socketapp, Open CMD and type "npm start" <br />
-The data sent from python server is being displayed in the browser <br />
-Click on "Start/Stop" to start or stop sending data from the server <br />
+This repository contains a project that has a emulated terminal. The commands can be triggered through the backend and realtime data can be displayed in the fronend using a websocket.
 
-<br />
-<br />
-## Requirements
-Requires Python 3+
-<br />
-npm i socket.io-client <br />
+## Prerequisites
+- React
+- Python 3.7
 
-pip install Flask-SocketIO <br />
-pip install gevent-websocket
+## Demonstration
+
+Following demonstration executed by running `ping www.google.lk` 
+
+<img src="https://github.com/nimendrak/terminal-poc/blob/main/preview/preview.gif?raw=true" alt="animated-banner">
+
+## Instructions to Run the Project
+
+01. Install all the mentioned node modules by running `npm install` inside frontend folder.
+02. Install python libraries by running `pip3 install -r requirements.txt` inside backend folder.
+03. Run FastAPI backen by `uvicorn server.py:app` (Default port is `localhost/8000`)
+04. Go to socketapp, Open CMD and type `npm start`
