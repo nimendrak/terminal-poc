@@ -34,7 +34,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     print(resp)
 
                     # Take a break before next line is sent
-                    sleep(0.5)
+                    sleep(1)
                     
                 elif not process.poll():
                     break
