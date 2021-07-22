@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import Terminal from "react-terminal-view";
 // import Terminal, { ColorMode, LineType } from 'react-terminal-ui';
 
-class Dashboard extends React.Component {
+class TerminalView extends React.Component {
   state = {
     logs: ["Backend Logs"],
     socketData: "",
@@ -45,4 +45,4 @@ class Dashboard extends React.Component {
     );
   }
 }
-export default Dashboard;
+export default TerminalView;
