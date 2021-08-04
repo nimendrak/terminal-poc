@@ -4,6 +4,10 @@ import subprocess
 
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
 
 @app.websocket("/shell")
 async def websocket_endpoint(websocket: WebSocket):
